@@ -1,26 +1,41 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, {useState, useEffect} from 'react'
+import LineChart from './components/LineChart';
+import InputForm from './components/InputForm';
+import InitialData from './initialData';
 
 function App() {
+  const [user, setUser] = useState("");
+  const [data, setData] = useState([]);
+ 
+  useEffect(() => {
+    setData(JSON.parse(window.localStorage.getItem("user-data")) || InitialData);
+  }, []);
+
+  useEffect(() => {
+    window.localStorage.setItem(
+      "user-data", 
+      JSON.stringify(data)
+    );
+  }, [data]);
+
+  const projects = () => {
+    return(
+      data.map((data, index) => (
+          <div key={index}>
+            <p>{data.projectName}</p>
+            <p>{data.text}</p>
+            <LineChart data={data} />
+          </div>
+      ))
+    )
+  }
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      APP
+      {projects()}
+      <InputForm setUser={setUser} setData={setData} data={data}/>
     </div>
-  );
+  )
 }
 
-export default App;
+export default App
