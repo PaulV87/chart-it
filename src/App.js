@@ -3,8 +3,6 @@ import {  BrowserRouter as Router,
           Switch,
           Route,
           Link } from 'react-router-dom';
-import LineChart from './components/LineChart';
-import InputForm from './components/InputForm';
 import NewChart from './components/NewChart';
 import Chart from './components/Chart';
 import ProjectList from './components/ProjectList';
@@ -31,7 +29,7 @@ function App() {
     );
   }, [data]);
 
-  const projects = () => {
+/*  const projects = () => {
     return(
       data.map((data, index) => (
           <div key={index}>
@@ -42,12 +40,13 @@ function App() {
       ))
     )
   }
+*/
   return (
     <Router>
       <GlobalStyle />
       <Switch>
         <Route exact path="/" render={(routeProps) => (<ProjectList routeProps={routeProps} data={data} />) }/>
-        <Route exact path="/charts/new" render={(routeProps) => (<NewChart />)} />
+        <Route exact path="/charts/new" render={(routeProps) => (<NewChart data={data} handleDataChange={setData}/>)} />
         <Route exact path="/charts/:id" render={(routeProps) => (<Chart chartId={routeProps.match.params.id} data={data} />)} />
         {/*  default route for invalid urls. Redirects to home page */ }
         <Route render={(routeProps) => (<ProjectList routeProps={routeProps} data={data} />) }/>
