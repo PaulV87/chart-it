@@ -1,10 +1,23 @@
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect} from 'react';
+import {  BrowserRouter as Router,
+          Switch,
+          Route,
+          Link } from 'react-router-dom';
 import LineChart from './components/LineChart';
 import InputForm from './components/InputForm';
+import NewChart from './components/NewChart';
+import Chart from './components/Chart';
+import ProjectList from './components/ProjectList';
 import InitialData from './initialData';
+import { createGlobalStyle } from 'styled-components';
+import reset from 'styled-reset';
+
+const GlobalStyle = createGlobalStyle`
+  ${reset}
+  /* other styles */
+`
 
 function App() {
-  const [user, setUser] = useState("");
   const [data, setData] = useState([]);
  
   useEffect(() => {
@@ -30,11 +43,17 @@ function App() {
     )
   }
   return (
-    <div>
-      APP
-      {projects()}
-      <InputForm setUser={setUser} setData={setData} data={data}/>
-    </div>
+    <Router>
+      <GlobalStyle />
+      <Switch>
+        <Route exact path="/" render={(routeProps) => (<ProjectList routeProps={routeProps} data={data} />) }/>
+        <Route exact path="/charts/new" render={(routeProps) => (<NewChart />)} />
+        <Route exact path="/charts/:id" render={(routeProps) => (<Chart chartId={routeProps.match.params.id} data={data} />)} />
+        {/*  default route for invalid urls. Redirects to home page */ }
+        <Route render={(routeProps) => (<ProjectList routeProps={routeProps} data={data} />) }/>
+      </Switch>
+    </Router>
+    
   )
 }
 
