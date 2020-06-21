@@ -2,6 +2,7 @@ import React, {useState } from 'react';
 import useInputState from "../hooks/useInputState";
 import styled from 'styled-components';
 import InputFormField from './InputFormField';
+import { v4 as uuidv4 } from 'uuid';
 
 const Form = styled.form`
   background-color: orange;
@@ -28,15 +29,17 @@ const FormFieldInput = styled.input`
 
 function InputForm({ data, handleDataChange }) {
   const [label, setLabel] = useState([]);
-  const [projectData, setProjectData] = useState([]);
   const [xAxis, setxAxis] = useState([]);
 
   const [projectValue, handleProjectChange, projectReset] = useInputState("");
   const [labelValue, handleLabelChange, labelReset] = useInputState("");
   const [xAxisValue, handlexAxisChange, xAxisReset] = useInputState("");
 
-  const formSubmit = (label) => {
-
+  const formSubmit = (evt, label) => {
+    evt.preventDefault();
+    projectReset();
+    labelReset();
+    xAxisReset();
   }
 
   const addData = (array, dataValue, reset, setField) => {
@@ -44,10 +47,26 @@ function InputForm({ data, handleDataChange }) {
     reset();
   }
 
+  const createProjectData = (newLabel) => {
+    const newData = {
+      label: newLabel,
+      id: uuidv4(),
+      borderColor: "blue",
+      data: [],
+      fill: true,
+    }
+
+    setLabel([...label, newData]);
+  }
+
+  const setProjectDataArray = (input, id) => {   
+    setLabel(label.map(object => object.id === id ? {...object, data: [...object.data, input]} : object)); 
+  }
+
   const createFormFields = () => {
     return label.map((data, index) => (
       <FormField key={index}>
-        <InputFormField title={data}/>
+        <InputFormField title={data.label} id={data.id} setProjectDataArray={setProjectDataArray}/>
       </FormField>
     ))
   }
@@ -57,10 +76,7 @@ function InputForm({ data, handleDataChange }) {
     <div>    
       <Form 
         onSubmit={e => {
-          e.preventDefault();
-          formSubmit(labelValue);
-          projectReset();
-          labelReset();
+          formSubmit(e, labelValue);
         }}
       >
         <FormField>
@@ -79,12 +95,12 @@ function InputForm({ data, handleDataChange }) {
             value={labelValue} 
             onChange={handleLabelChange} 
           />        
-        <button onClick={() => addData(label, labelValue, labelReset, setLabel)}>Add label</button>
+        <button onClick={() => createProjectData(labelValue)}>Add label</button>
         </FormField>
         {createFormFields()}
         <h2>X Axis Data</h2>
         <FormField>
-          <FormFieldLabel htmlFor="xAxisInput">Label Name</FormFieldLabel>
+          <FormFieldLabel htmlFor="xAxisInput">X Axis</FormFieldLabel>
           <FormFieldInput
             id="xAxisInput"
             value={xAxisValue} 
@@ -92,12 +108,14 @@ function InputForm({ data, handleDataChange }) {
           />        
         <button onClick={() => addData(xAxis, xAxisValue, xAxisReset, setxAxis)}>Add X Axis</button>
         </FormField>
-        <button>Submit</button>
+        <button onClick={e => {
+          formSubmit(e, labelValue);
+        }}>Submit</button>
       </Form>
       <h1>Data preview</h1>
       <div>
         <h2>Labels</h2>
-        {label}
+        {label.map( object => object.label)}
       </div>
       <div>
         <h2>XAxis</h2>
